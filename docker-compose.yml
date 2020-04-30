@@ -1,0 +1,40 @@
+version: '3.3'
+services:
+    jonny_account:
+        container_name: 'jonny_account_service'
+        environment:
+            PORT: '5000'
+            NODE_ENV: 'development'
+        build: .
+        ports:
+            - '5000:5000'
+        volumes:
+            - .:/usr/src/app
+        command: node_modules/.bin/nodemon --watch . --delay 2.5 --exec 'ts-node' ./index.ts
+        depends_on:
+            - jonny-db
+    jonny-db:
+        container_name: 'jonny_db'
+        image: mysql:5.7
+        restart: always
+        network_mode: bridge
+        environment:
+            MYSQL_DATABASE: 'db'
+            # So you don't have to use root, but you can if you like
+            MYSQL_USER: 'root'
+            # You can use whatever password you like
+            MYSQL_PASSWORD: 'root'
+            # Password for root access
+            MYSQL_ROOT_PASSWORD: 'root'
+        ports:
+            # <Port exposed> : < MySQL Port running inside container>
+            - 3306:3306
+        expose:
+            # Opens port 3306 on the container
+            - 3306
+            # Where our data will be persisted
+        volumes:
+            - jonny-db:/var/lib/mysql
+    # Names our volume
+volumes:
+    jonny-db:
