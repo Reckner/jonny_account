@@ -10,7 +10,7 @@ services:
             - '5000:5000'
         volumes:
             - .:/usr/src/app
-        command: node_modules/.bin/nodemon --watch . --delay 2.5 --exec 'ts-node' ./index.ts
+        command: node_modules/ts-node/dist/bin.js ./index.ts
         depends_on:
             - jonny-db
     jonny-db:
