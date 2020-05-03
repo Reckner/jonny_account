@@ -2,6 +2,7 @@ import { User } from '../models/User';
 import { Context, ParameterizedContext } from 'koa';
 import { getManager, Repository } from 'typeorm';
 import { request, summary, responsesAll, tagsAll } from 'koa-swagger-decorator';
+import jwt from 'jsonwebtoken';
 
 import { saltHashPassword, genRandomString } from '../auth/sha512';
 import { createUniqueIdentifier } from '../db/identifier';
@@ -48,7 +49,7 @@ export default class UserController {
         } = ctx.request.body;
 
         if (ValidateEmail(email)) {
-            if (username.trim().length === 0) {
+            if (username.trim().length !== 0) {
                 if (ValidatePassword(password)) {
                     const passwordData = saltHashPassword(password);
 
@@ -63,9 +64,18 @@ export default class UserController {
                     u.confirm_requested = new Date();
 
                     try {
-                        const newUser: User = await userRepository.save(u);
+                        await userRepository.save(u);
+
+                        const token = jwt.sign(
+                            { identifier: u.identifier },
+                            process.env.JWT_SECRET || 'secret',
+                            {
+                                expiresIn: 86400, // expires in 24 hours
+                            },
+                        );
+
                         ctx.status = 200;
-                        ctx.body = newUser;
+                        ctx.body = { auth: true, token };
                     } catch (err) {
                         const { errno, code, message } = err;
 
