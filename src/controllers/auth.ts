@@ -2,6 +2,7 @@ import { User } from '../models/User';
 import { request, summary, responsesAll, tagsAll } from 'koa-swagger-decorator';
 import { Context, ParameterizedContext } from 'koa';
 import { getManager, Repository } from 'typeorm';
+import jwt from 'jsonwebtoken';
 
 import { sha512 } from '../auth/sha512';
 
@@ -29,9 +30,18 @@ export default class AuthController {
             const passwordData = sha512(password, user.password_salt);
 
             if (passwordData.hash === user.password_hash) {
+                const token = jwt.sign(
+                    { identifier: user.identifier },
+                    process.env.JWT_SECRET || 'secret',
+                    {
+                        expiresIn: 86400, // expires in 24 hours
+                    },
+                );
+
                 ctx.status = 200;
                 ctx.body = {
-                    message: `'${email}', you have successfully signed in. `,
+                    auth: true,
+                    token,
                 };
             } else {
                 ctx.status = 401;
