@@ -48,7 +48,7 @@ export default class UserController {
         } = ctx.request.body;
 
         if (ValidateEmail(email)) {
-            if (username.trim().length === 0) {
+            if (username.trim().length !== 0) {
                 if (ValidatePassword(password)) {
                     const passwordData = saltHashPassword(password);
 
@@ -86,7 +86,7 @@ export default class UserController {
                 } else {
                     ctx.status = 400;
                     ctx.body = {
-                        message: `Not valid password. Should contain at least one number, one uppercase and one lowercase letter and one symbol.`,
+                        message: `Not valid password. Should contain at least one number, one uppercase and one lowercase letter.`,
                     };
                 }
             } else {
