@@ -32,6 +32,21 @@ export default class UserController {
         ctx.body = users;
     }
 
+    @request('get', '/user/:identifier')
+    @summary('Find user by identifier')
+    public static async findUserbyIdentifier(identifier: string) {
+        const userRepository: Repository<User> = getManager().getRepository(
+            User,
+        );
+
+        // load user with specific identifier
+        const user: User | undefined = await userRepository.findOne({
+            identifier,
+        });
+
+        return user;
+    }
+
     public static async createAccount(ctx: Context) {
         // get an user repository to perform operations with user
         const userRepository: Repository<User> = getManager().getRepository(
