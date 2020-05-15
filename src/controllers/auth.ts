@@ -31,7 +31,11 @@ export default class AuthController {
 
             if (passwordData.hash === user.password_hash) {
                 const token = jwt.sign(
-                    { identifier: user.identifier },
+                    {
+                        identifier: user.identifier,
+                        username: user.username,
+                        email: user.email,
+                    },
                     process.env.JWT_SECRET || 'secret',
                     {
                         expiresIn: 86400, // expires in 24 hours

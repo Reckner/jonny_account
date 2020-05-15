@@ -82,7 +82,11 @@ export default class UserController {
                         await userRepository.save(u);
 
                         const token = jwt.sign(
-                            { identifier: u.identifier },
+                            {
+                                identifier: u.identifier,
+                                username: u.username,
+                                email: u.email,
+                            },
                             process.env.JWT_SECRET || 'secret',
                             {
                                 expiresIn: 86400, // expires in 24 hours
